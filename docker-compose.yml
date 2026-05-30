@@ -1,0 +1,54 @@
+services:
+  caddy:
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    container_name: infra-proxy-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      BASE_DOMAIN: ${BASE_DOMAIN}
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:-}
+    volumes:
+      - ./config/Caddyfile:/etc/caddy/Caddyfile.d/routes.caddy:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - proxy-net
+
+  netdata:
+    profiles:
+      - monitoring
+    image: netdata/netdata
+    container_name: infra-proxy-netdata
+    restart: unless-stopped
+    cap_add:
+      - SYS_PTRACE
+    network_mode: host
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  cloudflared:
+    profiles:
+      - staging
+    image: cloudflare/cloudflared
+    container_name: infra-proxy-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN:?Set TUNNEL_TOKEN for staging}
+    networks:
+      - proxy-net
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  proxy-net:
+    external: true

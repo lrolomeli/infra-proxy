@@ -1,0 +1,13 @@
+# ── Routing ──────────────────────────────────────────────────────────────────
+# Agrega cada app como un bloque. Caddy maneja SSL automáticamente.
+# Para staging sin IP pública, usa Cloudflare Tunnel (el SSL lo termina Cloudflare).
+# ──────────────────────────────────────────────────────────────────────────────
+
+cosmeticosplasa.com, www.cosmeticosplasa.com {
+    reverse_proxy restauto-frontend:80
+}
+
+# Ejemplo para otra app:
+# otra-app.com, www.otra-app.com {
+#     reverse_proxy otra-app-frontend:80
+# }
