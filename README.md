@@ -9,6 +9,14 @@ Stack compartido de reverse proxy para VPS con múltiples apps.
 | **caddy** | Proxy inverso con SSL automático (Let's Encrypt) | siempre |
 | **netdata** | Monitoreo del servidor | `monitoring` |
 
+## Requisitos
+
+Red Docker compartida (crear solo una vez por VPS):
+
+```bash
+docker network create proxy-net
+```
+
 ## Despliegue
 
 ```bash
