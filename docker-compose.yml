@@ -10,7 +10,6 @@ services:
       - "443:443"
       - "443:443/udp"
     environment:
-      BASE_DOMAIN: ${BASE_DOMAIN}
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:-}
     volumes:
       - ./config/Caddyfile:/etc/caddy/Caddyfile.d/routes.caddy:ro
