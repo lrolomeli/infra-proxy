@@ -1,13 +1,15 @@
 # ── Routing ──────────────────────────────────────────────────────────────────
-# Caddy maneja SSL automático. Con CLOUDFLARE_API_TOKEN obtiene wildcard certs.
-# Sin token: certs self-signed (HTTP-01, sin wildcard).
+# Caddy usa tls internal (self-signed). Cloudflare Tunnel tiene noTLSVerify:true
+# así que el SSL se maneja en el edge de Cloudflare, no en Caddy.
 # ──────────────────────────────────────────────────────────────────────────────
 
 *.aytencargo.com.mx, aytencargo.com.mx, www.aytencargo.com.mx {
+    tls internal
     reverse_proxy gs-frontend:80
 }
 
 *.cosmeticosplasa.com, cosmeticosplasa.com, www.cosmeticosplasa.com {
+    tls internal
     reverse_proxy restauto-frontend:80
 }
 
