@@ -3,11 +3,15 @@
 # Para staging sin IP pública, usa Cloudflare Tunnel (el SSL lo termina Cloudflare).
 # ──────────────────────────────────────────────────────────────────────────────
 
+aytencargoxfa.com, www.aytencargoxfa.com {
+    reverse_proxy gs-frontend:80
+}
+
 cosmeticosplasa.com, www.cosmeticosplasa.com {
     reverse_proxy restauto-frontend:80
 }
 
-# Ejemplo para otra app:
+# Agrega nuevas apps aquí:
 # otra-app.com, www.otra-app.com {
 #     reverse_proxy otra-app-frontend:80
 # }
