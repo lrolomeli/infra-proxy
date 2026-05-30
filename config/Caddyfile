@@ -13,7 +13,8 @@
     reverse_proxy restauto-frontend:80
 }
 
-*.aytencargo.com, aytencargo.com, www.aytencargo.com {
+*.aytencargo.com, aytencargo.com, www.aytencargo.com,
+*.aytencargo.mx, aytencargo.mx, www.aytencargo.mx {
     tls internal
     reverse_proxy aytc-frontend:80
 }
