@@ -1,17 +1,17 @@
 # ── Routing ──────────────────────────────────────────────────────────────────
-# Agrega cada app como un bloque. Caddy maneja SSL automáticamente.
-# Para staging sin IP pública, usa Cloudflare Tunnel (el SSL lo termina Cloudflare).
+# Caddy maneja SSL automático. Con CLOUDFLARE_API_TOKEN obtiene wildcard certs.
+# Sin token: certs self-signed (HTTP-01, sin wildcard).
 # ──────────────────────────────────────────────────────────────────────────────
 
-aytencargo.com.mx, www.aytencargo.com.mx {
+*.aytencargo.com.mx, aytencargo.com.mx, www.aytencargo.com.mx {
     reverse_proxy gs-frontend:80
 }
 
-cosmeticosplasa.com, www.cosmeticosplasa.com {
+*.cosmeticosplasa.com, cosmeticosplasa.com, www.cosmeticosplasa.com {
     reverse_proxy restauto-frontend:80
 }
 
-# Agrega nuevas apps aquí:
-# otra-app.com, www.otra-app.com {
+# ── Agrega nuevas apps aquí ─────────────────────────────────────────────────
+# *.midominio.com, midominio.com, www.midominio.com {
 #     reverse_proxy otra-app-frontend:80
 # }
