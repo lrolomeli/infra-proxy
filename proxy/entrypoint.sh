@@ -9,11 +9,8 @@ if [ -n "$CLOUDFLARE_API_TOKEN" ]; then
 }
 CADDYEOF
 else
-  # Sin token → Cloudflare Tunnel termina SSL en el edge.
-  # Desactivamos auto-HTTPS para evitar bucle de redirects.
   cat > /etc/caddy/Caddyfile.d/globals.caddy <<CADDYEOF
 {
-    auto_https off
 }
 CADDYEOF
 fi
