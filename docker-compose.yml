@@ -34,15 +34,6 @@ services:
       - /sys:/host/sys:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
-  cloudflared:
-    profiles:
-      - staging
-    image: cloudflare/cloudflared
-    container_name: infra-proxy-cloudflared
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN:?Set TUNNEL_TOKEN for staging}
-    networks:
-      - proxy-net
 
 volumes:
   caddy_data:

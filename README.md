@@ -8,14 +8,13 @@ Stack compartido de reverse proxy para VPS con múltiples apps.
 |----------|-------------|---------|
 | **caddy** | Proxy inverso con SSL automático (Let's Encrypt) | siempre |
 | **netdata** | Monitoreo del servidor | `monitoring` |
-| **cloudflared** | Tunnel para staging sin IP pública | `staging` |
 
 ## Despliegue
 
 ```bash
 # Setup inicial
 cp .env.example .env
-# Edita .env con CLOUDFLARE_API_TOKEN y/o TUNNEL_TOKEN
+# Edita .env con CLOUDFLARE_API_TOKEN
 ```
 
 ### Producción
@@ -26,40 +25,24 @@ docker compose up -d --build
 
 ### Staging
 
-Elige la opción según cómo tengas configurado el tunnel.
+El VPS de staging no tiene IP pública, usa Cloudflare Tunnel como servicio del sistema (systemd).
 
-#### Opción A — cloudflared como servicio del sistema (systemd)
-
-Útil si ya tienes cloudflared corriendo por fuera de Docker y no quieres migrarlo.
-
-```bash
-s docker compose up -d --build
-```
-
-Luego actualiza el archivo de configuración de tu tunnel (`~/.cloudflared/config.yml`) para que apunte a `infra-proxy-caddy:80`:
+Asegúrate de que el tunnel apunte a `infra-proxy-caddy:80` en `~/.cloudflared/config.yml`:
 
 ```yaml
 url: http://infra-proxy-caddy:80
+```
+
+Luego levanta solo Caddy:
+
+```bash
+docker compose up -d --build
 ```
 
 Con monitoreo:
 
 ```bash
 docker compose --profile monitoring up -d --build
-```
-
-#### Opción B — cloudflared en Docker (recomendada para setups nuevos)
-
-Infra-proxy incluye cloudflared como servicio Docker. Solo necesitas el token del tunnel.
-
-```bash
-docker compose --profile staging up -d --build
-```
-
-Con monitoreo:
-
-```bash
-docker compose --profile monitoring --profile staging up -d --build
 ```
 
 ## Agregar una app
