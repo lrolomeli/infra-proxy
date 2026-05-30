@@ -3,7 +3,7 @@
 # Para staging sin IP pública, usa Cloudflare Tunnel (el SSL lo termina Cloudflare).
 # ──────────────────────────────────────────────────────────────────────────────
 
-aytencargoxfa.com, www.aytencargoxfa.com {
+aytencargo.com.mx, www.aytencargo.com.mx {
     reverse_proxy gs-frontend:80
 }
 
