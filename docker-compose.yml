@@ -40,7 +40,7 @@ services:
     image: cloudflare/cloudflared
     container_name: infra-proxy-cloudflared
     restart: unless-stopped
-    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN:?Set TUNNEL_TOKEN in .env}
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN:-}
     networks:
       - proxy-net
 
