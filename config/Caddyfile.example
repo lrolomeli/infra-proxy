@@ -7,16 +7,23 @@
     tls internal
 
     # API va directo al backend (evita doble proxy vía nginx/frontend)
+    # Requiere que el backend esté conectado a proxy-net
     handle_path /api/* {
-        reverse_proxy midominio-backend:5000
+        reverse_proxy midominio-backend:5000 {
+            header_up Host {http.request.host}
+        }
     }
 
     # Términos y privacidad servidos por backend
     handle /privacy* {
-        reverse_proxy midominio-backend:5000
+        reverse_proxy midominio-backend:5000 {
+            header_up Host {http.request.host}
+        }
     }
     handle /terms* {
-        reverse_proxy midominio-backend:5000
+        reverse_proxy midominio-backend:5000 {
+            header_up Host {http.request.host}
+        }
     }
 
     # Todo lo demás → frontend (SPA, landing, assets)
