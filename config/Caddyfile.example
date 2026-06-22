@@ -5,7 +5,29 @@
 
 midominio.com {
     tls internal
-    reverse_proxy mi-app-frontend:80
+
+    # API va directo al backend (evita doble proxy vía nginx/frontend)
+    handle_path /api/* {
+        reverse_proxy midominio-backend:5000
+    }
+
+    # Términos y privacidad servidos por backend
+    handle /privacy* {
+        reverse_proxy midominio-backend:5000
+    }
+    handle /terms* {
+        reverse_proxy midominio-backend:5000
+    }
+
+    # Imágenes: intenta servirlas desde frontend, fallback a backend
+    handle /images/* {
+        reverse_proxy midominio-frontend:80
+    }
+
+    # Todo lo demás → frontend (SPA, landing, assets)
+    handle {
+        reverse_proxy midominio-frontend:80
+    }
 }
 
 # ── Nuevas apps ─────────────────────────────────────────────────────────────
