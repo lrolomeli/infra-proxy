@@ -3,7 +3,7 @@
 # así que el SSL se maneja en el edge de Cloudflare, no en Caddy.
 # ──────────────────────────────────────────────────────────────────────────────
 
-midominio.com {
+*.midominio.com, midominio.com, www.midominio.com {
     tls internal
 
     # API va directo al backend (evita doble proxy vía nginx/frontend)
@@ -19,11 +19,6 @@ midominio.com {
         reverse_proxy midominio-backend:5000
     }
 
-    # Imágenes: intenta servirlas desde frontend, fallback a backend
-    handle /images/* {
-        reverse_proxy midominio-frontend:80
-    }
-
     # Todo lo demás → frontend (SPA, landing, assets)
     handle {
         reverse_proxy midominio-frontend:80
@@ -31,7 +26,8 @@ midominio.com {
 }
 
 # ── Nuevas apps ─────────────────────────────────────────────────────────────
-# midominio.com {
+# *.otrodominio.com, otrodiminio.com {
 #     tls internal
-#     reverse_proxy otra-app-frontend:80
+#     handle_path /api/* { reverse_proxy otra-app-backend:5000 }
+#     handle { reverse_proxy otra-app-frontend:80 }
 # }
