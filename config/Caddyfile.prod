@@ -3,31 +3,61 @@
 # para obtener wildcard certs reales vía DNS-01 de Cloudflare
 # ──────────────────────────────────────────────────────────────────────────────
 
-*.midominio.com, midominio.com, www.midominio.com {
+aytencargoxfa.com, *.aytencargoxfa.com {
     handle_path /api/* {
-        reverse_proxy midominio-backend:5000 {
+        reverse_proxy gs-backend:5000 {
             header_up Host {http.request.host}
         }
     }
 
     handle /privacy* {
-        reverse_proxy midominio-backend:5000 {
+        reverse_proxy gs-backend:5000 {
             header_up Host {http.request.host}
         }
     }
     handle /terms* {
-        reverse_proxy midominio-backend:5000 {
+        reverse_proxy gs-backend:5000 {
             header_up Host {http.request.host}
         }
     }
 
     handle {
-        reverse_proxy midominio-frontend:80
+        reverse_proxy gs-frontend:80
     }
 }
 
-# ── Nuevas apps ─────────────────────────────────────────────────────────────
-# *.otrodominio.com, otrodiminio.com {
-#     handle_path /api/* { reverse_proxy otra-app-backend:5000 }
-#     handle { reverse_proxy otra-app-frontend:80 }
-# }
+dominio2.com, *.dominio2.com {
+    handle_path /api/* {
+        reverse_proxy gs-backend:5000 {
+            header_up Host {http.request.host}
+        }
+    }
+
+    handle {
+        reverse_proxy gs-frontend:80
+    }
+}
+
+dominio3.com, *.dominio3.com {
+    handle_path /api/* {
+        reverse_proxy gs-backend:5000 {
+            header_up Host {http.request.host}
+        }
+    }
+
+    handle {
+        reverse_proxy gs-frontend:80
+    }
+}
+
+dominio4.com, *.dominio4.com {
+    handle_path /api/* {
+        reverse_proxy gs-backend:5000 {
+            header_up Host {http.request.host}
+        }
+    }
+
+    handle {
+        reverse_proxy gs-frontend:80
+    }
+}
