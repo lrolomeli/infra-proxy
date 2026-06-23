@@ -24,17 +24,34 @@ Stack compartido de reverse proxy para VPS con múltiples apps.
 
 ```bash
 cp .env.example .env
-# Edita .env según el entorno:
-#   Producción → CLOUDFLARE_API_TOKEN
-#   Staging    → TUNNEL_TOKEN (CADDY_MODE=staging, sin token de Cloudflare)
+# Edita .env: configura APPS, CADDY_MODE, y las variables de cada app
 ```
 
-La variable `CADDY_MODE` define qué configuración usa Caddy:
+## Configuración de apps
 
-| `CADDY_MODE` | Caddyfile | TLS | `CLOUDFLARE_API_TOKEN` |
-|---|---|---|---|
-| `prod` (default) | `config/Caddyfile.prod` | Wildcard real vía DNS-01 | Requerido |
-| `staging` | `config/Caddyfile.staging` | `tls internal` (self-signed) | No necesario |
+El Caddyfile se genera automáticamente en el entrypoint desde las variables del `.env`.
+Cada app necesita un bloque `APP_N_*` completo — todas las variables son obligatorias.
+
+```env
+APPS=2
+
+APP_1_DOMAIN=midominio.com
+APP_1_BACKEND_HOST=mi-backend
+APP_1_BACKEND_PORT=5000
+APP_1_FRONTEND_HOST=mi-frontend
+APP_1_FRONTEND_PORT=80
+
+APP_2_DOMAIN=otrodominio.com
+APP_2_BACKEND_HOST=otro-backend
+APP_2_BACKEND_PORT=3000
+APP_2_FRONTEND_HOST=otro-frontend
+APP_2_FRONTEND_PORT=8080
+```
+
+Por cada app se genera un bloque con:
+- `/api/*` → `BACKEND_HOST:BACKEND_PORT`
+- `/privacy*`, `/terms*` → `BACKEND_HOST:BACKEND_PORT`
+- Todo lo demás → `FRONTEND_HOST:FRONTEND_PORT`
 
 ## Despliegue
 
@@ -73,13 +90,16 @@ docker compose --profile staging --profile monitoring up -d --build
 
 ## Agregar una app
 
-1. La app debe tener una red externa `proxy-net` y conectar su frontend a ella
-2. Agrega el dominio en `config/Caddyfile.prod` (producción) o `config/Caddyfile.staging` (staging)
+1. La app debe tener una red externa `proxy-net` y conectar sus contenedores a ella
+2. Agrega un bloque `APP_N_*` en `.env` e incrementa `APPS`
 3. Recarga Caddy:
 
 ```bash
 docker compose up -d --build caddy
 ```
+
+> **Legacy:** Anteriormente se usaban archivos `config/Caddyfile.prod` y `config/Caddyfile.staging`
+> que se editaban manualmente. Ahora todo se configura desde `.env`.
 
 ## Ayuda
 
