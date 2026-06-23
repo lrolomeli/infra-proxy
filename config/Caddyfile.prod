@@ -1,20 +1,15 @@
-# ── Routing ──────────────────────────────────────────────────────────────────
-# Caddy usa tls internal (self-signed). Cloudflare Tunnel tiene noTLSVerify:true
-# así que el SSL se maneja en el edge de Cloudflare, no en Caddy.
+# ── Routing (producción) ──────────────────────────────────────────────────────
+# Sin tls — usa el ACME DNS global configurado en entrypoint.sh
+# para obtener wildcard certs reales vía DNS-01 de Cloudflare
 # ──────────────────────────────────────────────────────────────────────────────
 
 *.midominio.com, midominio.com, www.midominio.com {
-    tls internal
-
-    # API va directo al backend (evita doble proxy vía nginx/frontend)
-    # Requiere que el backend esté conectado a proxy-net
     handle_path /api/* {
         reverse_proxy midominio-backend:5000 {
             header_up Host {http.request.host}
         }
     }
 
-    # Términos y privacidad servidos por backend
     handle /privacy* {
         reverse_proxy midominio-backend:5000 {
             header_up Host {http.request.host}
@@ -26,7 +21,6 @@
         }
     }
 
-    # Todo lo demás → frontend (SPA, landing, assets)
     handle {
         reverse_proxy midominio-frontend:80
     }
@@ -34,7 +28,6 @@
 
 # ── Nuevas apps ─────────────────────────────────────────────────────────────
 # *.otrodominio.com, otrodiminio.com {
-#     tls internal
 #     handle_path /api/* { reverse_proxy otra-app-backend:5000 }
 #     handle { reverse_proxy otra-app-frontend:80 }
 # }

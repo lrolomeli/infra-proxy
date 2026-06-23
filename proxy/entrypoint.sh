@@ -1,19 +1,33 @@
 #!/bin/sh
+set -e
 
 mkdir -p /etc/caddy/Caddyfile.d
 
-if [ -n "$CLOUDFLARE_API_TOKEN" ]; then
-  cat > /etc/caddy/Caddyfile.d/globals.caddy <<CADDYEOF
+CADDY_MODE=${CADDY_MODE:-prod}
+
+case "$CADDY_MODE" in
+  prod|production)
+    if [ -f /config/Caddyfile.prod ]; then
+      cp /config/Caddyfile.prod /etc/caddy/Caddyfile.d/routes.caddy
+    fi
+    if [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+      cat > /etc/caddy/Caddyfile.d/globals.caddy <<CADDYEOF
 {
     acme_dns cloudflare ${CLOUDFLARE_API_TOKEN}
 }
 CADDYEOF
-else
-  cat > /etc/caddy/Caddyfile.d/globals.caddy <<CADDYEOF
+    fi
+    ;;
+  staging)
+    if [ -f /config/Caddyfile.staging ]; then
+      cp /config/Caddyfile.staging /etc/caddy/Caddyfile.d/routes.caddy
+    fi
+    cat > /etc/caddy/Caddyfile.d/globals.caddy <<CADDYEOF
 {
 }
 CADDYEOF
-fi
+    ;;
+esac
 
 cat > /etc/caddy/Caddyfile <<CADDYEOF
 import Caddyfile.d/globals.caddy

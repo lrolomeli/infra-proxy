@@ -11,8 +11,9 @@ services:
       - "443:443/udp"
     environment:
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:-}
+      CADDY_MODE: ${CADDY_MODE:-prod}
     volumes:
-      - ./config/Caddyfile:/etc/caddy/Caddyfile.d/routes.caddy:ro
+      - ./config:/config:ro
       - caddy_data:/data
       - caddy_config:/config
     networks:
