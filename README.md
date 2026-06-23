@@ -36,28 +36,34 @@ Caddy detecta automáticamente el modo:
 ## Configuración de apps
 
 El Caddyfile se genera automáticamente en el entrypoint desde las variables del `.env`.
-Cada app necesita un bloque `APP_N_*` completo — todas las variables son obligatorias.
+Cada app necesita `DOMAIN` + al menos `BACKEND_HOST` o `FRONTEND_HOST`.
+
+| Variable | Obligatoria | Genera |
+|----------|-------------|--------|
+| `DOMAIN` | ✅ Siempre | Dominio y wildcard |
+| `BACKEND_HOST` + `BACKEND_PORT` | Solo si hay backend | Rutas `/api/*`, `/privacy*`, `/terms*` |
+| `FRONTEND_HOST` + `FRONTEND_PORT` | Solo si hay frontend | Catch-all (todo lo demás) |
 
 ```env
-APPS=2
+APPS=3
 
+# backend + frontend
 APP_1_DOMAIN=midominio.com
-APP_1_BACKEND_HOST=mi-backend
+APP_1_BACKEND_HOST=gs-backend
 APP_1_BACKEND_PORT=5000
-APP_1_FRONTEND_HOST=mi-frontend
+APP_1_FRONTEND_HOST=gs-frontend
 APP_1_FRONTEND_PORT=80
 
-APP_2_DOMAIN=otrodominio.com
-APP_2_BACKEND_HOST=otro-backend
-APP_2_BACKEND_PORT=3000
-APP_2_FRONTEND_HOST=otro-frontend
-APP_2_FRONTEND_PORT=8080
-```
+# backend only (todo lo demás da 404)
+APP_2_DOMAIN=api-only.com
+APP_2_BACKEND_HOST=api-backend
+APP_2_BACKEND_PORT=8080
 
-Por cada app se genera un bloque con:
-- `/api/*` → `BACKEND_HOST:BACKEND_PORT`
-- `/privacy*`, `/terms*` → `BACKEND_HOST:BACKEND_PORT`
-- Todo lo demás → `FRONTEND_HOST:FRONTEND_PORT`
+# frontend only (sin /api/*)
+APP_3_DOMAIN=landing.com
+APP_3_FRONTEND_HOST=landing-frontend
+APP_3_FRONTEND_PORT=80
+```
 
 ## Despliegue
 

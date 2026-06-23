@@ -28,34 +28,43 @@ while [ "$i" -le "$APPS" ]; do
   eval "FRONTEND_PORT=\${APP_${i}_FRONTEND_PORT:-}"
 
   if [ -z "$DOMAIN" ]; then echo "ERROR: APP_${i}_DOMAIN is required" >&2; exit 1; fi
-  if [ -z "$BACKEND_HOST" ]; then echo "ERROR: APP_${i}_BACKEND_HOST is required" >&2; exit 1; fi
-  if [ -z "$BACKEND_PORT" ]; then echo "ERROR: APP_${i}_BACKEND_PORT is required" >&2; exit 1; fi
-  if [ -z "$FRONTEND_HOST" ]; then echo "ERROR: APP_${i}_FRONTEND_HOST is required" >&2; exit 1; fi
-  if [ -z "$FRONTEND_PORT" ]; then echo "ERROR: APP_${i}_FRONTEND_PORT is required" >&2; exit 1; fi
+  if [ -z "$BACKEND_HOST" ] && [ -z "$FRONTEND_HOST" ]; then
+    echo "ERROR: APP_${i} needs at least BACKEND_HOST or FRONTEND_HOST" >&2; exit 1
+  fi
+  if [ -n "$BACKEND_HOST" ] && [ -z "$BACKEND_PORT" ]; then
+    echo "ERROR: APP_${i}_BACKEND_PORT required when BACKEND_HOST is set" >&2; exit 1
+  fi
+  if [ -n "$FRONTEND_HOST" ] && [ -z "$FRONTEND_PORT" ]; then
+    echo "ERROR: APP_${i}_FRONTEND_PORT required when FRONTEND_HOST is set" >&2; exit 1
+  fi
 
   {
     echo "${DOMAIN}, *.${DOMAIN} {"
     if [ "$IS_STAGING" = "1" ]; then
       echo "    tls internal"
     fi
-    echo "    handle_path /api/* {"
-    echo "        reverse_proxy ${BACKEND_HOST}:${BACKEND_PORT} {"
-    echo "            header_up Host {http.request.host}"
-    echo "        }"
-    echo "    }"
-    echo "    handle /privacy* {"
-    echo "        reverse_proxy ${BACKEND_HOST}:${BACKEND_PORT} {"
-    echo "            header_up Host {http.request.host}"
-    echo "        }"
-    echo "    }"
-    echo "    handle /terms* {"
-    echo "        reverse_proxy ${BACKEND_HOST}:${BACKEND_PORT} {"
-    echo "            header_up Host {http.request.host}"
-    echo "        }"
-    echo "    }"
-    echo "    handle {"
-    echo "        reverse_proxy ${FRONTEND_HOST}:${FRONTEND_PORT}"
-    echo "    }"
+    if [ -n "$BACKEND_HOST" ]; then
+      echo "    handle_path /api/* {"
+      echo "        reverse_proxy ${BACKEND_HOST}:${BACKEND_PORT} {"
+      echo "            header_up Host {http.request.host}"
+      echo "        }"
+      echo "    }"
+      echo "    handle /privacy* {"
+      echo "        reverse_proxy ${BACKEND_HOST}:${BACKEND_PORT} {"
+      echo "            header_up Host {http.request.host}"
+      echo "        }"
+      echo "    }"
+      echo "    handle /terms* {"
+      echo "        reverse_proxy ${BACKEND_HOST}:${BACKEND_PORT} {"
+      echo "            header_up Host {http.request.host}"
+      echo "        }"
+      echo "    }"
+    fi
+    if [ -n "$FRONTEND_HOST" ]; then
+      echo "    handle {"
+      echo "        reverse_proxy ${FRONTEND_HOST}:${FRONTEND_PORT}"
+      echo "    }"
+    fi
     echo "}"
     echo ""
   } >> /etc/caddy/Caddyfile.d/routes.caddy
