@@ -3,7 +3,12 @@ set -e
 
 mkdir -p /etc/caddy/Caddyfile.d
 
-CADDY_MODE=${CADDY_MODE:-prod}
+# ── Detect mode: staging if TUNNEL_TOKEN is set, otherwise prod ─────────────
+if [ -n "$TUNNEL_TOKEN" ]; then
+  IS_STAGING=1
+else
+  IS_STAGING=0
+fi
 
 # ── Validate APPS ────────────────────────────────────────────────────────────
 if [ -z "$APPS" ] || [ "$APPS" -le 0 ] 2>/dev/null; then
@@ -30,7 +35,7 @@ while [ "$i" -le "$APPS" ]; do
 
   {
     echo "${DOMAIN}, *.${DOMAIN} {"
-    if [ "$CADDY_MODE" = "staging" ]; then
+    if [ "$IS_STAGING" = "1" ]; then
       echo "    tls internal"
     fi
     echo "    handle_path /api/* {"

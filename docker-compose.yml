@@ -12,7 +12,6 @@ services:
     env_file: .env
     environment:
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:-}
-      CADDY_MODE: ${CADDY_MODE:-prod}
     volumes:
       - ./config:/caddy-config:ro
       - caddy_data:/data

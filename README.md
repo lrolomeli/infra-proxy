@@ -24,8 +24,14 @@ Stack compartido de reverse proxy para VPS con múltiples apps.
 
 ```bash
 cp .env.example .env
-# Edita .env: configura APPS, CADDY_MODE, y las variables de cada app
+# Edita .env según el entorno:
+#   Producción → CLOUDFLARE_API_TOKEN (sin TUNNEL_TOKEN)
+#   Staging    → TUNNEL_TOKEN (CLOUDFLARE_API_TOKEN no necesario)
 ```
+
+Caddy detecta automáticamente el modo:
+- **`TUNNEL_TOKEN` definido** → staging (`tls internal`)
+- **`TUNNEL_TOKEN` vacío** → producción (certs reales vía DNS-01)
 
 ## Configuración de apps
 
@@ -76,7 +82,7 @@ docker compose --profile staging up -d --build
 ```
 
 Levanta Caddy + cloudflared. El tunnel se conecta a Cloudflare, que termina SSL en el edge.
-Caddy usa `tls internal` — no necesita `CLOUDFLARE_API_TOKEN`.
+Caddy usa `tls internal` automáticamente al detectar `TUNNEL_TOKEN`.
 
 Configura el public hostname en **Cloudflare Zero Trust Dashboard** → Tunnels → `infra-proxy`:
 - **Service**: `HTTPS` → `infra-proxy-caddy:443`
@@ -97,9 +103,6 @@ docker compose --profile staging --profile monitoring up -d --build
 ```bash
 docker compose up -d --build caddy
 ```
-
-> **Legacy:** Anteriormente se usaban archivos `config/Caddyfile.prod` y `config/Caddyfile.staging`
-> que se editaban manualmente. Ahora todo se configura desde `.env`.
 
 ## Ayuda
 
