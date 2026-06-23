@@ -39,7 +39,7 @@ while [ "$i" -le "$APPS" ]; do
   fi
 
   {
-    echo "${DOMAIN}, *.${DOMAIN} {"
+    echo "*.${DOMAIN}, ${DOMAIN}, www.${DOMAIN} {"
     if [ "$IS_STAGING" = "1" ]; then
       echo "    tls internal"
     fi
