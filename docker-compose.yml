@@ -13,7 +13,7 @@ services:
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:-}
       CADDY_MODE: ${CADDY_MODE:-prod}
     volumes:
-      - ./config:/config:ro
+      - ./config:/caddy-config:ro
       - caddy_data:/data
       - caddy_config:/config
     networks:
