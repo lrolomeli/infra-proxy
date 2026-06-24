@@ -43,6 +43,9 @@ while [ "$i" -le "$APPS" ]; do
     if [ "$IS_STAGING" = "1" ]; then
       echo "    tls internal"
     fi
+    # Redirect www → bare domain
+    echo "    @www host www.${DOMAIN}"
+    echo "    redir @www https://${DOMAIN}{uri} permanent"
     if [ -n "$BACKEND_HOST" ]; then
       echo "    handle_path /api/* {"
       echo "        reverse_proxy ${BACKEND_HOST}:${BACKEND_PORT} {"
